@@ -39,7 +39,7 @@ pipeline {
                     cd $WORKSPACE
 
                     aws cloudformation deploy \
-                    --template-file cloudformation.json \
+                    --template-file infra.json \
                     --stack-name chaos-lab-stack
                     '''
                 }
