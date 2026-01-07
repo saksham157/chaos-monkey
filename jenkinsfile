@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Git Pull') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Start Payment') {
+            steps {
+                sh '''
+                cd payment
+                npm install
+                node server.js &
+                '''
+            }
+        }
+
+        stage('Start Order') {
+            steps {
+                sh '''
+                cd order
+                npm install
+                node order_service.js  &
+                '''
+            }
+        }
+
+        stage('Chaos Test') {
+            steps {
+                sh '''
+                cd chaos
+                node monkey.js &
+                bash ../recovery/heal.sh &
+                '''
+            }
+        }
+
+    }
+}

@@ -1,0 +1,36 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Dummy production - order & payment servers",
+
+  "Resources": {
+
+    "OrderServer": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": "ami-0c2af51e265bd5e0e",
+        "InstanceType": "t2.micro",
+        "UserData": {
+          "Fn::Base64": "#!/bin/bash\napt update -y\napt install -y nodejs npm git\ncd /home/ubuntu\ngit clone https://github.com/skasham157/chaos-lab-2hour.git\ncd chaos-lab-2hour/order\nnpm install\nnode server.js &\n"
+        },
+        "Tags": [
+          { "Key": "Name", "Value": "order-service" }
+        ]
+      }
+    },
+
+    "PaymentServer": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": "ami-0c2af51e265bd5e0e",
+        "InstanceType": "t2.micro",
+        "UserData": {
+          "Fn::Base64": "#!/bin/bash\napt update -y\napt install -y nodejs npm git\ncd /home/ubuntu\ngit clone https://github.com/saksham157/chaos-lab.git\ncd chaos-lab-2hour/payment\nnpm install\nnode server.js &\n"
+        },
+        "Tags": [
+          { "Key": "Name", "Value": "payment-service" }
+        ]
+      }
+    }
+
+  }
+}
