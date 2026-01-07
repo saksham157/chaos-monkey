@@ -1,56 +1,49 @@
-stage('Deploy EC2') {
-   steps {
-       withCredentials([string(credentialsId: 'AWS_ACCESS_KEY', variable: 'AWS_ACCESS_KEY_ID'),
-                        string(credentialsId: 'AWS_SECRET_KEY', variable: 'AWS_SECRET_ACCESS_KEY')]) {
-
-           sh '''
-           cd $WORKSPACE
-           aws cloudformation deploy \
-           --template-file chaos-monkey.json \
-           --stack-name chaos-lab-stack
-           '''
-       }
-   }
-}
-
 pipeline {
     agent any
 
     stages {
 
-        stage('Git Pull') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('Start Payment') {
+        stage('Install AWS CLI if missing') {
             steps {
                 sh '''
-                cd payment
-                npm install
-                node server.js &
+                if ! command -v aws
+                then
+                    echo "Installing AWS CLI v2"
+
+                    cd /tmp
+                    curl https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o awscliv2.zip
+
+                    apt install -y unzip
+                    unzip -o awscliv2.zip
+
+                    sudo ./aws/install --update
+                fi
+
+                aws --version
                 '''
             }
         }
 
-        stage('Start Order') {
+        stage('Create EC2') {
             steps {
-                sh '''
-                cd order
-                npm install
-                node order_service.js  &
-                '''
-            }
-        }
 
-        stage('Chaos Test') {
-            steps {
-                sh '''
-                cd chaos
-                node monkey.js &
-                bash ../recovery/heal.sh &
-                '''
+                withCredentials([
+                    string(credentialsId: 'AWS_ACCESS_KEY', variable: 'AWS_ACCESS_KEY'),
+                    string(credentialsId: 'AWS_SECRET_KEY', variable: 'AWS_SECRET_KEY')
+                ]) {
+
+                    sh '''
+                    export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY
+                    export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_KEY
+
+                    cd $WORKSPACE
+
+                    aws cloudformation deploy \
+                    --template-file cloudformation.json \
+                    --stack-name chaos-lab-stack
+                    '''
+                }
+
             }
         }
 
