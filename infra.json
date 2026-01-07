@@ -1,33 +1,41 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Dummy production - order & payment servers",
+  "Description": "Create EC2 for Jenkins automation lab",
 
   "Resources": {
 
-    "OrderServer": {
-      "Type": "AWS::EC2::Instance",
+    "ChaosSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
-        "ImageId": "ami-0c2af51e265bd5e0e",
-        "InstanceType": "t2.micro",
-        "UserData": {
-          "Fn::Base64": "#!/bin/bash\napt update -y\napt install -y nodejs npm git\ncd /home/ubuntu\ngit clone https://github.com/skasham157/chaos-lab-2hour.git\ncd chaos-lab-2hour/order\nnpm install\nnode server.js &\n"
-        },
-        "Tags": [
-          { "Key": "Name", "Value": "order-service" }
+        "GroupDescription": "allow ports for order payment jenkins",
+        "SecurityGroupIngress": [
+          { "IpProtocol": "tcp", "FromPort": 8080, "ToPort": 8080, "CidrIp": "0.0.0.0/0" },
+          { "IpProtocol": "tcp", "FromPort": 3000, "ToPort": 3000, "CidrIp": "0.0.0.0/0" },
+          { "IpProtocol": "tcp", "FromPort": 3001, "ToPort": 3001, "CidrIp": "0.0.0.0/0" },
+          { "IpProtocol": "tcp", "FromPort": 22,   "ToPort": 22,   "CidrIp": "0.0.0.0/0" }
         ]
       }
     },
 
-    "PaymentServer": {
+    "ChaosLabEC2": {
       "Type": "AWS::EC2::Instance",
+      "DependsOn": ["ChaosSecurityGroup"],
       "Properties": {
         "ImageId": "ami-0c2af51e265bd5e0e",
         "InstanceType": "t2.micro",
+
+        "KeyName": "chaos-keypair",
+
+        "SecurityGroupIds": [
+          { "Ref": "ChaosSecurityGroup" }
+        ],
+
         "UserData": {
-          "Fn::Base64": "#!/bin/bash\napt update -y\napt install -y nodejs npm git\ncd /home/ubuntu\ngit clone https://github.com/saksham157/chaos-lab.git\ncd chaos-lab-2hour/payment\nnpm install\nnode server.js &\n"
+          "Fn::Base64": "#!/bin/bash\n# prepare jenkins workspace\nmkdir -p /home/ubuntu\nchmod 777 /home/ubuntu\n"
         },
+
         "Tags": [
-          { "Key": "Name", "Value": "payment-service" }
+          { "Key": "Name", "Value": "chaos-lab" }
         ]
       }
     }

@@ -1,3 +1,18 @@
+stage('Deploy EC2') {
+   steps {
+       withCredentials([string(credentialsId: 'AWS_ACCESS_KEY', variable: 'AWS_ACCESS_KEY_ID'),
+                        string(credentialsId: 'AWS_SECRET_KEY', variable: 'AWS_SECRET_ACCESS_KEY')]) {
+
+           sh '''
+           cd $WORKSPACE
+           aws cloudformation deploy \
+           --template-file chaos-monkey.json \
+           --stack-name chaos-lab-stack
+           '''
+       }
+   }
+}
+
 pipeline {
     agent any
 
