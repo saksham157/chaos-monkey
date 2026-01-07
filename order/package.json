@@ -1,0 +1,21 @@
+{
+  "name": "order",
+  "version": "1.0.0",
+  "description": "dummy order service for chaos lab",
+  "main": "order_service.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon order_service.js",
+    "test": "echo \"no tests yet\""
+  },
+  "keywords": [],
+  "author": "Saksham Singh",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.13.2",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
