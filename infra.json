@@ -21,7 +21,7 @@
       "Type": "AWS::EC2::Instance",
       "DependsOn": ["ChaosSecurityGroup"],
       "Properties": {
-        "ImageId": "ami-0c2af51e265bd5e0e",
+        "ImageId": "ami-053b0d53c279acc90",
         "InstanceType": "t2.micro",
 
         "KeyName": "chaos-keypair",
@@ -31,7 +31,7 @@
         ],
 
         "UserData": {
-          "Fn::Base64": "#!/bin/bash\n# prepare jenkins workspace\nmkdir -p /home/ubuntu\nchmod 777 /home/ubuntu\n"
+          "Fn::Base64": "#!/bin/bash\napt update -y\nmkdir -p /home/ubuntu\nchmod 777 /home/ubuntu\n"
         },
 
         "Tags": [
