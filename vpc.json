@@ -1,0 +1,20 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "this is order service iac for order service where we used pub/sub architecture",
+    "Resources": {
+        "OrderServiceVpc":{
+        "Type": "AWS::EC2::VPC",
+        "Properties": {
+            "CidrBlock": "10.0.0.0/16",
+            "EnableDnsHostnames": true,
+            "EnableDnsSupport": true,
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "order-service-vpc"
+                }
+            ]
+        }
+    }
+}
+}
